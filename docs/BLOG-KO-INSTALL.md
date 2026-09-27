@@ -18,7 +18,7 @@ SH Integration은 `.sh` 실행 파일을 Kindle 홈 라이브러리의 실행 �
 KTerm을 열고 아래 세 줄을 차례로 실행한다.
 
 ```sh
-/var/local/kmc/bin/kpm add-repo https://financewiki-park.github.io/k/
+/var/local/kmc/bin/kpm add-repo https://raw.githubusercontent.com/kindle-lab/kpm-repo/main/manifest.json
 /var/local/kmc/bin/kpm update
 /var/local/kmc/bin/kpm install korean-ime
 ```
@@ -108,6 +108,6 @@ Kingul의 안내는 MRPI로 설치한 뒤 KUAL 메뉴에서 키보드를 켜고,
 
 ## 참고
 
-- [Korean IME 소스와 KPM 패키지](https://github.com/financewiki-park/kindle-korean-ime)
+- [Korean IME 소스와 KPM 패키지](https://github.com/kindle-lab/kindle-korean-ime)
 - [Kingul 원 프로젝트와 설치·동작 설명](https://github.com/hy1o/kingul)
 - [KUAL Next의 SH Integration 및 실행 파일 메타데이터 설명](https://github.com/thiagokokada/kual-next)
