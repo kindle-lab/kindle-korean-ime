@@ -25,6 +25,8 @@ The canonical KPM installation manifest is maintained separately at:
 
 Built `.kpkg` files are not committed to this source repository. Normal CI runs keep them as GitHub Actions artifacts; tagged releases publish them as GitHub Release assets. The KPM hub mirrors the currently verified packages needed by Kindle clients.
 
+Current source release target: **v0.6.5**. Release assets are produced from CI; Kindle installation continues to use the canonical KPM hub above.
+
 ## Layout
 
 ```text
