@@ -29,4 +29,6 @@ Normal pushes and pull requests:
 
 A `v*` tag additionally publishes the built `.kpkg` files as GitHub Release assets. The tag must match the IME package version, for example `v0.6.5`.
 
+For a migration/bootstrap release where the matching tag does not yet exist, an exact main-branch commit message of `release: publish vX.Y.Z` may create the matching tag and Release from that commit. This is a controlled fallback, not the normal development commit pattern.
+
 The unified `kindle-lab/kpm-repo` repository remains the KPM-facing registry and keeps the currently verified package mirrors required by installed Kindle clients.
