@@ -55,10 +55,10 @@ jobs:
           tar -C build/package-ime -czf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg \
             manifest.json install.sh launch.sh uninstall.sh scriptlets bin
 
-          tar -tzf dist/korean-ime-probe_0.2.5_kindlehf-kindlepw2.kpkg | grep -qx 'launch.sh'
-          tar -tzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -qx 'bin/kindlehf/korean-ime-x11'
-          tar -tzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -qx 'scriptlets/start-korean-ime.sh'
-          tar -tzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -qx 'scriptlets/icon.png'
+          tar -tzf dist/korean-ime-probe_0.2.5_kindlehf-kindlepw2.kpkg | grep -Fx 'launch.sh' >/dev/null
+          tar -tzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -Fx 'bin/kindlehf/korean-ime-x11' >/dev/null
+          tar -tzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -Fx 'scriptlets/start-korean-ime.sh' >/dev/null
+          tar -tzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -Fx 'scriptlets/icon.png' >/dev/null
           tar -tvzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -Eq '^-rwxr-xr-x .* (\./)?install.sh$'
           tar -tvzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -Eq '^-rwxr-xr-x .* (\./)?launch.sh$'
           tar -tvzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -Eq '^-rwxr-xr-x .* (\./)?uninstall.sh$'
