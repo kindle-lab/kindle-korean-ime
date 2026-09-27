@@ -6,7 +6,7 @@
   "packages": {
     "korean-ime-probe": {
       "name": "Korean IME Probe",
-      "author": "financewiki-park",
+      "author": "kindle-lab",
       "description": "Read-only Kindle keyboard compatibility probe.",
       "artifacts": [
         {
@@ -26,7 +26,7 @@
     },
     "korean-ime": {
       "name": "Korean IME native-focus trial",
-      "author": "financewiki-park",
+      "author": "kindle-lab",
       "description": "Trial Dubeolsik composition bridge for the observed native Kindle GTK input method.",
       "artifacts": [
         {
