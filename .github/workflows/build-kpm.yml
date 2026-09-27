@@ -1,10 +1,10 @@
-name: Build and publish KPM packages
+name: Build KPM packages
 
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - 'packages/**'
+    tags: ['v*']
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -15,16 +15,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Install host validation tools
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libx11-dev
+
       - name: Run host composition tests and strict build
         run: make test host
+
       - name: Fetch koxtoolchain targets
         run: |
           curl --fail --location --retry 3 https://github.com/KindleModding/koxtoolchain/releases/latest/download/kindlepw2.tar.gz | tar -xzf - -C "$HOME"
           curl --fail --location --retry 3 https://github.com/KindleModding/koxtoolchain/releases/latest/download/kindlehf.tar.gz | tar -xzf - -C "$HOME"
+
       - name: Cross-build and inspect ARM binaries
         run: |
+          set -euo pipefail
           export PATH="$HOME/x-tools/arm-kindlepw2-linux-gnueabi/bin:$HOME/x-tools/arm-kindlehf-linux-gnueabihf/bin:$PATH"
           mkdir -p build/arm/kindlepw2 build/arm/kindlehf
           make arm BUILD=build/arm/kindlepw2 CROSS_COMPILE=arm-kindlepw2-linux-gnueabi-
@@ -32,31 +37,60 @@ jobs:
           file build/arm/kindlepw2/korean-ime-x11 build/arm/kindlehf/korean-ime-x11
           readelf -h build/arm/kindlepw2/korean-ime-x11 | grep -E 'Class:.*ELF32|Machine:.*ARM'
           readelf -h build/arm/kindlehf/korean-ime-x11 | grep -E 'Class:.*ELF32|Machine:.*ARM'
+
       - name: Assemble and validate KPM archives
         run: |
-          mkdir -p packages/korean-ime-probe/artifacts packages/korean-ime/artifacts
-          tar -C package -czf packages/korean-ime-probe/artifacts/korean-ime-probe_0.2.5_kindlehf-kindlepw2.kpkg manifest.json install.sh launch.sh uninstall.sh probe
-          rm -rf build/package-ime && cp -a ime-package build/package-ime
+          set -euo pipefail
+          mkdir -p dist
+
+          tar -C packaging/probe -czf dist/korean-ime-probe_0.2.5_kindlehf-kindlepw2.kpkg \
+            manifest.json install.sh launch.sh uninstall.sh probe
+
+          rm -rf build/package-ime
+          cp -a packaging/korean-ime build/package-ime
           mkdir -p build/package-ime/bin/kindlepw2 build/package-ime/bin/kindlehf
           cp build/arm/kindlepw2/korean-ime-x11 build/package-ime/bin/kindlepw2/
           cp build/arm/kindlehf/korean-ime-x11 build/package-ime/bin/kindlehf/
-          tar -C build/package-ime -czf packages/korean-ime/artifacts/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg manifest.json install.sh launch.sh uninstall.sh scriptlets bin
-          tar -tzf packages/korean-ime-probe/artifacts/korean-ime-probe_0.2.5_kindlehf-kindlepw2.kpkg | grep -qx 'launch.sh'
-          tar -tzf packages/korean-ime/artifacts/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -qx 'bin/kindlehf/korean-ime-x11'
-          tar -tzf packages/korean-ime/artifacts/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -qx 'scriptlets/start-korean-ime.sh'
-          tar -tzf packages/korean-ime/artifacts/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -qx 'scriptlets/icon.png'
-          tar -tvzf packages/korean-ime/artifacts/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -Eq '^-rwxr-xr-x .* (\./)?install.sh$'
-          tar -tvzf packages/korean-ime/artifacts/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -Eq '^-rwxr-xr-x .* (\./)?launch.sh$'
-          tar -tvzf packages/korean-ime/artifacts/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -Eq '^-rwxr-xr-x .* (\./)?uninstall.sh$'
-          python3 scripts/validate_kpm.py manifest.json packages/korean-ime-probe/artifacts/korean-ime-probe_0.2.5_kindlehf-kindlepw2.kpkg packages/korean-ime/artifacts/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg
+
+          tar -C build/package-ime -czf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg \
+            manifest.json install.sh launch.sh uninstall.sh scriptlets bin
+
+          tar -tzf dist/korean-ime-probe_0.2.5_kindlehf-kindlepw2.kpkg | grep -qx 'launch.sh'
+          tar -tzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -qx 'bin/kindlehf/korean-ime-x11'
+          tar -tzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -qx 'scriptlets/start-korean-ime.sh'
+          tar -tzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -qx 'scriptlets/icon.png'
+          tar -tvzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -Eq '^-rwxr-xr-x .* (\./)?install.sh$'
+          tar -tvzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -Eq '^-rwxr-xr-x .* (\./)?launch.sh$'
+          tar -tvzf dist/korean-ime_0.6.5_kindlehf-kindlepw2.kpkg | grep -Eq '^-rwxr-xr-x .* (\./)?uninstall.sh$'
+
+          python3 scripts/validate_kpm.py dist/*.kpkg
+
       - uses: actions/upload-artifact@v4
         with:
           name: korean-ime-kpm-0.6.5
-          path: packages/**/artifacts/*.kpkg
+          path: dist/*.kpkg
           if-no-files-found: error
-      - name: Publish immutable repository artifacts
+
+      - name: Publish tagged GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add -f packages
-          git diff --cached --quiet || (git commit -m 'Publish KPM artifacts 0.6.5' && git push)
+          set -euo pipefail
+          PACKAGE_VERSION="$(python3 - <<'PY'
+          import json
+          v = json.load(open("packaging/korean-ime/manifest.json", encoding="utf-8"))["version"]
+          print(".".join(map(str, v)))
+          PY
+          )"
+          EXPECTED_TAG="v$PACKAGE_VERSION"
+          if [ "$GITHUB_REF_NAME" != "$EXPECTED_TAG" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package version $EXPECTED_TAG" >&2
+            exit 2
+          fi
+
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || \
+            gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" \
+              --notes "KPM release artifacts for Kindle Korean IME $PACKAGE_VERSION."
+
+          gh release upload "$GITHUB_REF_NAME" dist/*.kpkg --clobber
