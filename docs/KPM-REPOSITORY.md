@@ -1,8 +1,12 @@
 # KPM repository
 
-Repository manifest:
+Canonical KPM hub manifest:
 
-https://raw.githubusercontent.com/financewiki-park/kindle-korean-ime/main/manifest.v2.json
+https://raw.githubusercontent.com/kindle-lab/kpm-repo/main/manifest.json
+
+Project-local standalone manifest:
+
+https://raw.githubusercontent.com/kindle-lab/kindle-korean-ime/main/manifest.v2.json
 
 Generated artifacts are stored under:
 
