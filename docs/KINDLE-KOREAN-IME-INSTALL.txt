@@ -20,7 +20,7 @@ SH Integration은 .sh 실행 파일을 Kindle 홈 라이브러리의 실행 항�
 
 KTerm을 열고 아래 한 줄을 실행합니다.
 
-/var/local/kmc/bin/kpm add-repo https://financewiki-park.github.io/k/
+/var/local/kmc/bin/kpm add-repo https://raw.githubusercontent.com/kindle-lab/kpm-repo/main/manifest.json
 
 저장소는 한 번만 등록하면 됩니다.
 
@@ -40,7 +40,7 @@ KTerm을 열고 아래 한 줄을 실행합니다.
 
 처음 설치할 때는 순서대로 아래 세 줄을 실행하면 됩니다.
 
-/var/local/kmc/bin/kpm add-repo https://financewiki-park.github.io/k/
+/var/local/kmc/bin/kpm add-repo https://raw.githubusercontent.com/kindle-lab/kpm-repo/main/manifest.json
 /var/local/kmc/bin/kpm update
 /var/local/kmc/bin/kpm install korean-ime
 
@@ -130,6 +130,6 @@ Kindle 기본 입력 체계에는 공개된 정식 IME API가 없습니다. Kore
 
 참고 주소
 
-Korean IME: https://github.com/financewiki-park/kindle-korean-ime
+Korean IME: https://github.com/kindle-lab/kindle-korean-ime
 Kingul: https://github.com/hy1o/kingul
 KUAL Next 및 SH Integration: https://github.com/thiagokokada/kual-next
